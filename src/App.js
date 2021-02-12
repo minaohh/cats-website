@@ -5,37 +5,43 @@ import { Dropdown, Button, Container, Row, Card, Col } from 'react-bootstrap';
 
 import { catsApi } from './api/catsApi';
 
-const PAGE_LIMIT = 10;
+const PAGE_LIMIT = 9;
 
 function App() {
+  //Breeds
   const [catBreeds, setCatBreeds] = useState(null);
   const [selectedBreed, setSelectedBreed] = useState('');
+  const [isLoadingBreeds, setIsLoadingBreeds] = useState(false);
+  //Cats
   const [cats, setCats] = useState([]);
-  const [catsPage, setCatsPage] = useState(0);
+  const [pageNum, setPageNum] = useState(0);
+  const [isLoadingCats, setIsLoadingCats] = useState(false);
+  const [catsFetchCount, setCatsFetchCount] = useState(0);
 
   const getBreedsAsync = async () => {
     try {
-      const response = await catsApi.get('/breeds');
+      setIsLoadingBreeds(true);
 
-      setCatBreeds(response.data);
-    } catch (err) {}
+      const response = await catsApi.get('/breeds');
+      console.log('breeds', response.data);
+
+      setCatBreeds([...response.data]);
+    } catch (err) {
+      //Todo Add alert
+    }
+
+    setIsLoadingBreeds(false);
   };
 
-  const handleCatBreed = (e) => {
+  const handleCatBreedChanged = (e) => {
     setSelectedBreed(e.target.value);
-    console.log('Selected Breed', selectedBreed);
-
     setCats([]);
-    setCatsPage(0);
-    console.log('cats', cats);
-    // console.log('Selected Breed', e.target.value);
-
-    loadCats();
+    setPageNum(0);
   };
 
   const loadCats = () => {
-    loadCatsAsync(catsPage);
-    setCatsPage(catsPage + 1);
+    loadCatsAsync(pageNum);
+    setPageNum(pageNum + 1);
   };
 
   const handleLoadClick = () => {
@@ -43,13 +49,27 @@ function App() {
   };
 
   const loadCatsAsync = async (pageNum) => {
-    const response = await catsApi.get(
-      `/images/search?breed_ids=${selectedBreed}&limit=${PAGE_LIMIT}&page=${pageNum}`
-    );
+    try {
+      setIsLoadingCats(true);
 
-    setCats([...response.data]);
-    console.log('selected breed cats', response.data);
+      const response = await catsApi.get(
+        `/images/search?breed_ids=${selectedBreed}&limit=${PAGE_LIMIT}&page=${pageNum}&order=DESC`
+      );
+
+      setCats([...cats, ...response.data]);
+      setCatsFetchCount(response.data.length);
+      console.log('selected breed cats', response);
+    } catch (err) {
+      //Todo add alert
+    }
+    setIsLoadingCats(false);
   };
+
+  useEffect(() => {
+    if (selectedBreed !== '') {
+      loadCats();
+    }
+  }, [selectedBreed]);
 
   useEffect(() => {
     getBreedsAsync();
@@ -62,22 +82,21 @@ function App() {
         <p>Breeds</p>
       </Row>
       <Row>
-        {catBreeds && (
-          <select
-            value={selectedBreed}
-            onChange={handleCatBreed}
-            className="form-control"
-          >
-            <option key="none" value>
-              Select Breed
-            </option>
-            {catBreeds.map((val, idx) => (
-              <option key={val.id} value={val.id}>
+        <select
+          value={selectedBreed}
+          onChange={handleCatBreedChanged}
+          className="form-control"
+        >
+          <option key="none" value>
+            Select Breed
+          </option>
+          {catBreeds &&
+            catBreeds.map((val, idx) => (
+              <option key={idx} value={val.id}>
                 {val.name}
               </option>
             ))}
-          </select>
-        )}
+        </select>
       </Row>
       <Row>
         {!cats || cats.length === 0 ? (
@@ -85,7 +104,7 @@ function App() {
         ) : (
           <>
             {cats.map((cat, idx) => (
-              <Col md="3" sm="6" key={cat.id}>
+              <Col md="3" sm="6" key={idx}>
                 <Card key={cat.id}>
                   <Card.Img
                     variant="top"
@@ -107,10 +126,10 @@ function App() {
       <Row>
         <Button
           variant="success"
-          disabled={!cats || cats.length === 0 || cats.length < PAGE_LIMIT}
+          disabled={catsFetchCount < PAGE_LIMIT}
           onClick={handleLoadClick}
         >
-          Load more
+          {isLoadingCats ? 'Loading cats...' : 'Load more'}
         </Button>
       </Row>
     </Container>
