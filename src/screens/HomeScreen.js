@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { Button, Container, Row, Card, Col } from 'react-bootstrap';
+import { useHistory } from 'react-router-dom';
 
 import { catsApi } from '../api/catsApi';
 import BreedContext from '../context/BreedContext';
@@ -16,7 +17,9 @@ const HomeScreen = () => {
   const [pageNum, setPageNum] = useState(0);
   const [isLoadingCats, setIsLoadingCats] = useState(false);
   const [catsFetchCount, setCatsFetchCount] = useState(0);
+
   const [breedContext, setBreedContext] = useContext(BreedContext);
+  const history = useHistory();
 
   const getBreedsAsync = async () => {
     try {
@@ -67,13 +70,9 @@ const HomeScreen = () => {
   };
 
   const handleDetailsClick = (e, cat) => {
-    console.log('handleDetailsClick', e);
-    console.log('target', e.target);
-    console.log('cat', cat);
-    //Update context
     setBreedContext(cat);
-
-    //Reroute
+    console.log('breedContext', breedContext);
+    history.push(`/${breedContext.id}`);
   };
 
   useEffect(() => {

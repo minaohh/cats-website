@@ -1,5 +1,6 @@
 import './App.css';
 import React, { useState } from 'react';
+import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 
 import BreedContext from './context/BreedContext';
 
@@ -12,7 +13,16 @@ function App() {
 
   return (
     <BreedContext.Provider value={[breedContext, setBreedContext]}>
-      <Home />
+      <Router>
+        <Switch>
+          <Route path="/:id">
+            <CatDetails />
+          </Route>
+          <Route path="/">
+            <Home />
+          </Route>
+        </Switch>
+      </Router>
     </BreedContext.Provider>
   );
 }
