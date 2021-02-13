@@ -3,6 +3,7 @@ import {
   Button,
   Container,
   Row,
+  Col,
   Card,
   Badge,
   Breadcrumb,
@@ -26,55 +27,58 @@ const CatDetails = () => {
   };
 
   return (
-    <Container className="mt-4 mb-4">
+    <Container className="my-4">
       {breedContext && breedContext.cat.breeds ? (
         <>
           <Row className="mb-3">
-            <Breadcrumb>
-              <Breadcrumb.Item href="/">
-                {/* <Link to="/">Home</Link> */}
-                Home
-              </Breadcrumb.Item>
-              <Breadcrumb.Item active>{breed.name}</Breadcrumb.Item>
-            </Breadcrumb>
+            <Col>
+              <Breadcrumb>
+                <Breadcrumb.Item href="/">Home</Breadcrumb.Item>
+                <Breadcrumb.Item active>{breed.name}</Breadcrumb.Item>
+              </Breadcrumb>
+            </Col>
           </Row>
           <Row className="mb-3">
-            <Card>
-              <Card.Header>
-                <Button variant="primary" onClick={handleBackClick}>
-                  Back
-                </Button>
-              </Card.Header>
-              <Card.Img variant="top" src={breedContext.cat.url} />
-              <Card.Body className="mx-4 mb-3">
-                <Row className="mb-2">
-                  <h1>{breed.name}</h1>
-                </Row>
-                <Row className="mb-3">
-                  <h3>Origin: {breed.origin}</h3>
-                </Row>
-                <Row className="mb-3">
-                  {breed.temperament.split(',').map((val, idx) => (
-                    <Badge
-                      pill
-                      variant="primary"
-                      key={idx}
-                      style={{ marginRight: 7, padding: 10 }}
-                    >
-                      {val}
-                    </Badge>
-                  ))}
-                </Row>
-                <Row className="mb-3">
-                  <Card.Text>{breed.description}</Card.Text>
-                </Row>
-              </Card.Body>
-            </Card>
+            <Col>
+              <Card>
+                <Card.Header>
+                  <Button variant="primary" onClick={handleBackClick}>
+                    Back
+                  </Button>
+                </Card.Header>
+                <Card.Img variant="top" src={breedContext.cat.url} />
+                <Card.Body className="mx-4 mb-3">
+                  <Row className="mb-2">
+                    <h1>{breed.name}</h1>
+                  </Row>
+                  <Row className="mb-3">
+                    <h3>Origin: {breed.origin}</h3>
+                  </Row>
+                  <Row className="mb-3">
+                    {breed.temperament.split(',').map((val, idx) => (
+                      <Badge
+                        pill
+                        variant="primary"
+                        key={idx}
+                        style={{ marginRight: 7, padding: 10, marginBottom: 5 }}
+                      >
+                        {val}
+                      </Badge>
+                    ))}
+                  </Row>
+                  <Row className="mb-3">
+                    <Card.Text>{breed.description}</Card.Text>
+                  </Row>
+                </Card.Body>
+              </Card>
+            </Col>
           </Row>
         </>
       ) : (
         <Row className="mb-3">
-          <p>Loading...</p>
+          <Col>
+            <p>Loading...</p>
+          </Col>
         </Row>
       )}
     </Container>
