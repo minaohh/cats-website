@@ -30,8 +30,14 @@ const CatDetails = () => {
             <Card.Body>
               <h1>{breed.name}</h1>
               <h3>Origin: {breed.origin}</h3>
+
               {breed.temperament.split(',').map((val, idx) => (
-                <Badge pill variant="primary" key={idx}>
+                <Badge
+                  pill
+                  variant="primary"
+                  key={idx}
+                  style={{ marginRight: 5, padding: 10 }}
+                >
                   {val}
                 </Badge>
               ))}

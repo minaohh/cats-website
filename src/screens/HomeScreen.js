@@ -4,40 +4,37 @@ import { useHistory } from 'react-router-dom';
 
 import { catsApi } from '../api/catsApi';
 import BreedContext from '../context/BreedContext';
+import { ErrorAlert } from '../components/ErrorAlert';
 
 const PAGE_LIMIT = 9;
 
 const HomeScreen = () => {
+  const [breedContext, setBreedContext] = useContext(BreedContext);
+  const history = useHistory();
   //Breeds
   const [catBreeds, setCatBreeds] = useState(null);
-  const [selectedBreed, setSelectedBreed] = useState('');
-  const [isLoadingBreeds, setIsLoadingBreeds] = useState(false);
+  const [hasError, setHasError] = useState(false);
   //Cats
   const [cats, setCats] = useState([]);
   const [pageNum, setPageNum] = useState(0);
   const [isLoadingCats, setIsLoadingCats] = useState(false);
   const [catsFetchCount, setCatsFetchCount] = useState(0);
 
-  const [breedContext, setBreedContext] = useContext(BreedContext);
-  const history = useHistory();
-
   const getBreedsAsync = async () => {
     try {
-      setIsLoadingBreeds(true);
+      setHasError(false);
 
       const response = await catsApi.get('/breeds');
       // console.log('breeds', response.data);
 
       setCatBreeds([...response.data]);
     } catch (err) {
-      //Todo Add alert
+      setHasError(true);
     }
-
-    setIsLoadingBreeds(false);
   };
 
   const handleCatBreedChanged = (e) => {
-    setSelectedBreed(e.target.value);
+    setBreedContext({ ...breedContext, breed: e.target.value });
     setCats([]);
     setPageNum(0);
   };
@@ -54,36 +51,41 @@ const HomeScreen = () => {
   const loadCatsAsync = async (pageNum) => {
     try {
       setIsLoadingCats(true);
+      setHasError(false);
 
       const response = await catsApi.get(
-        `/images/search?breed_ids=${selectedBreed}&limit=${PAGE_LIMIT}&page=${pageNum}&order=DESC`
+        `/images/search?breed_ids=${breedContext.breed}&limit=${PAGE_LIMIT}&page=${pageNum}&order=DESC`
       );
 
       setCats([...cats, ...response.data]);
       setCatsFetchCount(response.data.length);
-      console.log('fetch count:', catsFetchCount);
+      // console.log('fetch count:', catsFetchCount);
       // console.log('selected breed cats', response);
     } catch (err) {
-      //Todo add alert
+      setHasError(true);
     }
     setIsLoadingCats(false);
   };
 
   const handleDetailsClick = (e, cat) => {
-    setBreedContext(cat);
+    setBreedContext({ ...breedContext, ...cat });
     console.log('breedContext', breedContext);
     history.push(`/${breedContext.id}`);
   };
 
   useEffect(() => {
-    if (selectedBreed !== '') {
+    if (breedContext.breed !== '') {
       loadCats();
     }
-  }, [selectedBreed]);
+  }, [breedContext]);
 
   useEffect(() => {
     getBreedsAsync();
   }, []);
+
+  const showError = (show) => {
+    setHasError(show);
+  };
 
   return (
     <Container>
@@ -93,7 +95,7 @@ const HomeScreen = () => {
       </Row>
       <Row>
         <select
-          value={selectedBreed}
+          value={breedContext.breed}
           onChange={handleCatBreedChanged}
           className="form-control"
         >
@@ -108,6 +110,7 @@ const HomeScreen = () => {
             ))}
         </select>
       </Row>
+      {hasError && <ErrorAlert onShowAlert={(show) => showError(show)} />}
       <Row>
         {!cats || cats.length === 0 ? (
           <p>No cats available</p>

@@ -8,7 +8,10 @@ import Home from './screens/HomeScreen';
 import CatDetails from './screens/CatDetailsScreen';
 
 function App() {
-  const initialContextState = {};
+  const initialContextState = {
+    breed: '',
+    cat: {},
+  };
   const [breedContext, setBreedContext] = useState(initialContextState);
 
   return (
