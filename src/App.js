@@ -1,7 +1,6 @@
-import logo from './logo.svg';
 import './App.css';
 import React, { useState, useEffect } from 'react';
-import { Dropdown, Button, Container, Row, Card, Col } from 'react-bootstrap';
+import { Button, Container, Row, Card, Col } from 'react-bootstrap';
 
 import { catsApi } from './api/catsApi';
 
@@ -58,7 +57,8 @@ function App() {
 
       setCats([...cats, ...response.data]);
       setCatsFetchCount(response.data.length);
-      console.log('selected breed cats', response);
+      console.log('fetch count:', catsFetchCount);
+      // console.log('selected breed cats', response);
     } catch (err) {
       //Todo add alert
     }
