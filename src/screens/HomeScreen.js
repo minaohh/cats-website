@@ -13,10 +13,10 @@ const HomeScreen = () => {
   const history = useHistory();
 
   const [catBreeds, setCatBreeds] = useState(null);
-  const [cats, setCats] = useState([]);
+  const [cats, setCats] = useState({});
   const [pageNum, setPageNum] = useState(0);
   const [isLoadingCats, setIsLoadingCats] = useState(false);
-  const [catsFetchCount, setCatsFetchCount] = useState(1);
+  const [totalCats, setTotalCats] = useState(0);
   const [hasError, setHasError] = useState(false);
 
   //----------------
@@ -33,7 +33,7 @@ const HomeScreen = () => {
 
   const handleDetailsClick = (e, cat) => {
     setBreedContext({ ...breedContext, cat: { ...cat } });
-    console.log('breedContext', breedContext);
+    // console.log('breedContext', breedContext);
     history.push(`/${cat.id}`);
   };
 
@@ -59,10 +59,20 @@ const HomeScreen = () => {
       let query = `/images/search?breed_id=${breedContext.breed}&limit=${PAGE_LIMIT}&page=${pageNum}`;
       const response = await catsApi.get(query);
 
-      setCats([...cats, ...response.data]);
-      setCatsFetchCount(response.data.length);
-      console.log('selected breed cats', response);
-      console.log('cats', cats);
+      let temp = { ...cats };
+      response.data.map((val, i) => (temp[val.id] = val));
+
+      setCats(temp);
+
+      console.log('____page count', response.headers['pagination-count']);
+
+      setTotalCats(
+        response.headers['pagination-count']
+          ? response.headers['pagination-count']
+          : response.data.length
+      );
+
+      // console.log('cats', cats);
     } catch (err) {
       setHasError(true);
     }
@@ -79,6 +89,7 @@ const HomeScreen = () => {
   }, [breedContext.breed]);
 
   useEffect(() => {
+    window.scrollTo(0, 0);
     getBreedsAsync();
   }, []);
 
@@ -95,10 +106,13 @@ const HomeScreen = () => {
   };
 
   const initializeState = () => {
-    setCats([]);
+    setCats({});
     setPageNum(1);
-    setCatsFetchCount(0);
+    setTotalCats(0);
   };
+
+  console.log('Object.keys(cats).length', Object.keys(cats).length);
+  console.log('total count', totalCats);
 
   return (
     <Container className="my-4">
@@ -109,11 +123,11 @@ const HomeScreen = () => {
       </Row>
       <Row>
         <Col>
-          <p>Breeds</p>{' '}
+          <p>Breed</p>
         </Col>
       </Row>
       <Row className="mb-5">
-        <Col>
+        <Col lg="3">
           <select
             value={breedContext.breed}
             onChange={handleCatBreedChanged}
@@ -133,7 +147,9 @@ const HomeScreen = () => {
       </Row>
       {hasError && (
         <Row>
-          <ErrorAlert onShowAlert={(show) => showError(show)} />
+          <Col>
+            <ErrorAlert onShowAlert={(show) => showError(show)} />
+          </Col>
         </Row>
       )}
       <Row className="mb-3">
@@ -143,36 +159,45 @@ const HomeScreen = () => {
           </Col>
         ) : (
           <>
-            {cats.map((cat, idx) => (
-              <Col md="3" sm="6" key={idx}>
-                <Card key={cat.id} className="mb-3">
-                  <Card.Img variant="top" src={cat.url} rounded="true" />
-                  <Card.Body>
-                    <Button
-                      variant="primary"
-                      block
-                      size="lg"
-                      value={cat}
-                      onClick={(e) => handleDetailsClick(e, cat)}
-                    >
-                      View Details
-                    </Button>
-                  </Card.Body>
-                </Card>
-              </Col>
-            ))}
+            {Object.keys(cats).map((id, idx) => {
+              let cat = cats[id];
+
+              return (
+                <Col md="3" sm="6" key={idx}>
+                  <Card key={cat.id} className="mb-3">
+                    <Card.Img variant="top" src={cat.url} rounded="true" />
+                    <Card.Body>
+                      <Button
+                        variant="primary"
+                        block
+                        size="lg"
+                        value={cat}
+                        onClick={(e) => handleDetailsClick(e, cat)}
+                      >
+                        View Details
+                      </Button>
+                    </Card.Body>
+                  </Card>
+                </Col>
+              );
+            })}
           </>
         )}
       </Row>
       <Row className="mb-3">
         <Col>
-          <Button
-            variant="success"
-            disabled={catsFetchCount < PAGE_LIMIT}
-            onClick={handleLoadClick}
-          >
-            {isLoadingCats ? 'Loading cats...' : 'Load more'}
-          </Button>
+          {Object.keys(cats).length <= totalCats && (
+            <Button
+              variant="success"
+              disabled={
+                Object.keys(cats).length === 0 ||
+                Object.keys(cats).length > totalCats
+              }
+              onClick={handleLoadClick}
+            >
+              {isLoadingCats ? 'Loading cats...' : 'Load more'}
+            </Button>
+          )}
         </Col>
       </Row>
     </Container>

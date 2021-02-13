@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import {
   Button,
   Container,
@@ -25,6 +25,10 @@ const CatDetails = () => {
   const handleBackClick = (e) => {
     history.goBack();
   };
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   return (
     <Container className="my-4">
