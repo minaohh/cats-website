@@ -6,7 +6,7 @@ import { catsApi } from '../api/catsApi';
 import BreedContext from '../context/BreedContext';
 import { ErrorAlert } from '../components/ErrorAlert';
 
-const PAGE_LIMIT = 8;
+const PAGE_LIMIT = 10;
 
 const HomeScreen = () => {
   const [breedContext, setBreedContext] = useContext(BreedContext);
