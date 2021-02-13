@@ -6,7 +6,7 @@ import { catsApi } from '../api/catsApi';
 import BreedContext from '../context/BreedContext';
 import { ErrorAlert } from '../components/ErrorAlert';
 
-const PAGE_LIMIT = 9;
+const PAGE_LIMIT = 8;
 
 const HomeScreen = () => {
   const [breedContext, setBreedContext] = useContext(BreedContext);
@@ -25,8 +25,6 @@ const HomeScreen = () => {
       setHasError(false);
 
       const response = await catsApi.get('/breeds');
-      // console.log('breeds', response.data);
-
       setCatBreeds([...response.data]);
     } catch (err) {
       setHasError(true);
@@ -68,9 +66,9 @@ const HomeScreen = () => {
   };
 
   const handleDetailsClick = (e, cat) => {
-    setBreedContext({ ...breedContext, ...cat });
+    setBreedContext({ ...breedContext, cat: { ...cat } });
     console.log('breedContext', breedContext);
-    history.push(`/${breedContext.id}`);
+    history.push(`/${cat.id}`);
   };
 
   useEffect(() => {
@@ -88,12 +86,14 @@ const HomeScreen = () => {
   };
 
   return (
-    <Container>
-      <h1>Cat Browser</h1>
+    <Container className="mt-4 mb-4">
+      <Row className="mb-3">
+        <h1>Cat 🐈 Browser</h1>
+      </Row>
       <Row>
         <p>Breeds</p>
       </Row>
-      <Row>
+      <Row className="mb-5">
         <select
           value={breedContext.breed}
           onChange={handleCatBreedChanged}
@@ -110,15 +110,19 @@ const HomeScreen = () => {
             ))}
         </select>
       </Row>
-      {hasError && <ErrorAlert onShowAlert={(show) => showError(show)} />}
-      <Row>
+      {hasError && (
+        <Row>
+          <ErrorAlert onShowAlert={(show) => showError(show)} />
+        </Row>
+      )}
+      <Row className="mb-3">
         {!cats || cats.length === 0 ? (
           <p>No cats available</p>
         ) : (
           <>
             {cats.map((cat, idx) => (
               <Col md="3" sm="6" key={idx}>
-                <Card key={cat.id}>
+                <Card key={cat.id} className="mb-3">
                   <Card.Img
                     variant="top"
                     src={cat.url}
@@ -142,7 +146,7 @@ const HomeScreen = () => {
           </>
         )}
       </Row>
-      <Row>
+      <Row className="mb-3">
         <Button
           variant="success"
           disabled={catsFetchCount < PAGE_LIMIT}
