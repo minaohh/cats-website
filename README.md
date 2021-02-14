@@ -9,6 +9,8 @@ The website has two pages:
 
 ## Cats Home Page
 
+![Cats Home Page](../media/catBrowser_home.png)
+
 When the page is loaded, the dropdown element is populated by the list of **cat breeds** is fetched from [The Cat API](https://docs.thecatapi.com/).
 
 After a breed is selected, images of cats of this breed will be displayed in random order. Paging is applied.
@@ -20,6 +22,8 @@ After a breed is selected, images of cats of this breed will be displayed in ran
 Clicking the **View Details** button redirects the user to the Details page.
 
 ## Details Page
+
+![Cats Details Page](../media/catBrowser_details.png)
 
 This page shows the following information about the selected item
 
@@ -38,5 +42,7 @@ Added on the top-left portion of this page to quickly show the selected **breed*
 Clicking the **Home link** will redirect to the first page _without_ the breed pre-selected.
 
 ## Error Handling
+
+![Cats Website Error Handling](../media/catBrowser_error.png)
 
 An error message is displayed if there are issues with connecting or fetching from the API.
