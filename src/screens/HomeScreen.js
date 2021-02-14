@@ -16,7 +16,8 @@ const HomeScreen = () => {
   const [cats, setCats] = useState({});
   const [pageNum, setPageNum] = useState(0);
   const [isLoadingCats, setIsLoadingCats] = useState(false);
-  const [totalCats, setTotalCats] = useState(0);
+  // const [totalCats, setTotalCats] = useState(0);
+  const [loadMore, setLoadMore] = useState(true);
   const [hasError, setHasError] = useState(false);
 
   //----------------
@@ -35,6 +36,11 @@ const HomeScreen = () => {
     setBreedContext({ ...breedContext, cat: { ...cat } });
     // console.log('breedContext', breedContext);
     history.push(`/${cat.id}`);
+  };
+
+  const handleShowError = (show) => {
+    initializeState();
+    setHasError(show);
   };
 
   //----------------
@@ -56,23 +62,24 @@ const HomeScreen = () => {
       setIsLoadingCats(true);
       setHasError(false);
 
-      let query = `/images/search?breed_id=${breedContext.breed}&limit=${PAGE_LIMIT}&page=${pageNum}`;
-      const response = await catsApi.get(query);
-
-      let temp = { ...cats };
-      response.data.map((val, i) => (temp[val.id] = val));
-
-      setCats(temp);
-
-      console.log('____page count', response.headers['pagination-count']);
-
-      setTotalCats(
-        response.headers['pagination-count']
-          ? response.headers['pagination-count']
-          : response.data.length
+      const response = await catsApi.get(
+        `/images/search?breed_id=${breedContext.breed}&limit=${PAGE_LIMIT}&page=${pageNum}`
       );
 
-      // console.log('cats', cats);
+      let prevCatCount = Object.keys(cats).length;
+      let catList = { ...cats };
+      response.data.map((val, i) => (catList[val.id] = val));
+
+      setCats(catList);
+      setLoadMore(
+        prevCatCount === 0 ||
+          prevCatCount === PAGE_LIMIT ||
+          prevCatCount !== Object.keys(cats).length
+      );
+
+      console.log('oldCount', prevCatCount);
+      console.log('current count', Object.keys(cats).length);
+      console.log('loadMOre', loadMore);
     } catch (err) {
       setHasError(true);
     }
@@ -101,18 +108,11 @@ const HomeScreen = () => {
     setPageNum(pageNum + 1);
   };
 
-  const showError = (show) => {
-    setHasError(show);
-  };
-
   const initializeState = () => {
     setCats({});
     setPageNum(1);
-    setTotalCats(0);
+    setLoadMore(true);
   };
-
-  console.log('Object.keys(cats).length', Object.keys(cats).length);
-  console.log('total count', totalCats);
 
   return (
     <Container className="my-4">
@@ -127,7 +127,7 @@ const HomeScreen = () => {
         </Col>
       </Row>
       <Row className="mb-5">
-        <Col lg="3">
+        <Col lg="3" md="4" sm="6">
           <select
             value={breedContext.breed}
             onChange={handleCatBreedChanged}
@@ -148,7 +148,7 @@ const HomeScreen = () => {
       {hasError && (
         <Row>
           <Col>
-            <ErrorAlert onShowAlert={(show) => showError(show)} />
+            <ErrorAlert onShowAlert={(show) => handleShowError(show)} />
           </Col>
         </Row>
       )}
@@ -186,13 +186,10 @@ const HomeScreen = () => {
       </Row>
       <Row className="mb-3">
         <Col>
-          {Object.keys(cats).length <= totalCats && (
+          {loadMore === true && (
             <Button
               variant="success"
-              disabled={
-                Object.keys(cats).length === 0 ||
-                Object.keys(cats).length > totalCats
-              }
+              disabled={Object.keys(cats).length === 0}
               onClick={handleLoadClick}
             >
               {isLoadingCats ? 'Loading cats...' : 'Load more'}
