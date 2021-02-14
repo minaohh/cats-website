@@ -14,10 +14,6 @@ function App() {
   };
   const [breedContext, setBreedContext] = useState(initialContextState);
 
-  useEffect(() => {
-    document.title = 'Cat Browser';
-  }, []);
-
   return (
     <BreedContext.Provider value={[breedContext, setBreedContext]}>
       <Router>

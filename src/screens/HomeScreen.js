@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext, useParams } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Button, Container, Row, Card, Col } from 'react-bootstrap';
 import { useHistory } from 'react-router-dom';
 

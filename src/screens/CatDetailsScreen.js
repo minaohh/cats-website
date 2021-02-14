@@ -38,7 +38,7 @@ const CatDetails = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
     getCatImageAsync(id);
-  }, []);
+  }, [id]);
 
   return (
     <Container className="my-4">
