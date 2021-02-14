@@ -46,3 +46,7 @@ Clicking the **Home link** will redirect to the first page _without_ the breed p
 ![Cats Website Error Handling](../media/catBrowser_error.png)
 
 An error message is displayed if there are issues with connecting or fetching from the API.
+
+## Installation
+
+`npm install` or `yarn install`
