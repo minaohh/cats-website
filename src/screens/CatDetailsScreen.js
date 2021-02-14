@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import {
   Button,
   Container,
@@ -8,40 +8,63 @@ import {
   Badge,
   Breadcrumb,
 } from 'react-bootstrap';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useParams } from 'react-router-dom';
 
 import BreedContext from '../context/BreedContext';
+import { catsApi } from '../api/catsApi';
+import { ErrorAlert } from '../components';
 
 const CatDetails = () => {
   const history = useHistory();
-  const [breedContext] = useContext(BreedContext);
-  const [breed] =
-    breedContext &&
-    breedContext.cat.breeds &&
-    breedContext.cat.breeds.length > 0
-      ? breedContext.cat.breeds
-      : [];
+  const { id } = useParams();
+  const [breedContext, setBreedContext] = useContext(BreedContext);
+  const [cat, setCat] = useState(null);
 
   const handleBackClick = (e) => {
     history.goBack();
   };
 
+  const getCatImageAsync = async (imageId) => {
+    try {
+      setBreedContext({ ...breedContext, hasError: false });
+
+      const response = await catsApi.get(`/images/${imageId}`);
+      setCat(response.data);
+    } catch (err) {
+      setBreedContext({ ...breedContext, hasError: true });
+    }
+  };
+
   useEffect(() => {
     window.scrollTo(0, 0);
+    getCatImageAsync(id);
   }, []);
 
   return (
     <Container className="my-4">
-      {breedContext && breedContext.cat.breeds ? (
+      <Row className="mb-3">
+        <Col>
+          <Breadcrumb>
+            <Breadcrumb.Item href="/">Home</Breadcrumb.Item>
+            <Breadcrumb.Item active>
+              {cat && cat.breeds[0].name}
+            </Breadcrumb.Item>
+          </Breadcrumb>
+        </Col>
+      </Row>
+      {breedContext.hasError && (
+        <Row>
+          <Col>
+            <ErrorAlert
+              onShowAlert={(show) =>
+                setBreedContext({ ...breedContext, hasError: show })
+              }
+            />
+          </Col>
+        </Row>
+      )}
+      {cat && (
         <>
-          <Row className="mb-3">
-            <Col>
-              <Breadcrumb>
-                <Breadcrumb.Item href="/">Home</Breadcrumb.Item>
-                <Breadcrumb.Item active>{breed.name}</Breadcrumb.Item>
-              </Breadcrumb>
-            </Col>
-          </Row>
           <Row className="mb-3">
             <Col>
               <Card>
@@ -50,16 +73,16 @@ const CatDetails = () => {
                     Back
                   </Button>
                 </Card.Header>
-                <Card.Img variant="top" src={breedContext.cat.url} />
+                <Card.Img variant="top" src={cat.url} />
                 <Card.Body className="mx-4 mb-3">
                   <Row className="mb-2">
-                    <h1>{breed.name}</h1>
+                    <h1>{cat.breeds[0].name}</h1>
                   </Row>
                   <Row className="mb-3">
-                    <h3>Origin: {breed.origin}</h3>
+                    <h3>Origin: {cat.breeds[0].origin}</h3>
                   </Row>
                   <Row className="mb-3">
-                    {breed.temperament.split(',').map((val, idx) => (
+                    {cat.breeds[0].temperament.split(',').map((val, idx) => (
                       <Badge
                         pill
                         variant="primary"
@@ -71,14 +94,16 @@ const CatDetails = () => {
                     ))}
                   </Row>
                   <Row className="mb-3">
-                    <Card.Text>{breed.description}</Card.Text>
+                    <Card.Text>{cat.breeds[0].description}</Card.Text>
                   </Row>
                 </Card.Body>
               </Card>
             </Col>
           </Row>
         </>
-      ) : (
+      )}
+
+      {!cat && !breedContext.hasError && (
         <Row className="mb-3">
           <Col>
             <p>Loading...</p>

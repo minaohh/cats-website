@@ -1,6 +1,6 @@
 # Cats Website
 
-The **Cats 🐈 Website** uses [The Cat API](https://docs.thecatapi.com/) and displays all cats by breed and other information such as temperament, origin, and description.
+The **Cats Website** uses [The Cat API](https://docs.thecatapi.com/) and displays all cats by breed and other information such as temperament, origin, and description.
 
 The website has two pages:
 

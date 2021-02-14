@@ -1,10 +1,10 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useParams } from 'react';
 import { Button, Container, Row, Card, Col } from 'react-bootstrap';
 import { useHistory } from 'react-router-dom';
 
 import { catsApi } from '../api/catsApi';
 import BreedContext from '../context/BreedContext';
-import { ErrorAlert } from '../components/ErrorAlert';
+import { ErrorAlert } from '../components';
 
 const PAGE_LIMIT = 10;
 
@@ -16,9 +16,7 @@ const HomeScreen = () => {
   const [cats, setCats] = useState({});
   const [pageNum, setPageNum] = useState(0);
   const [isLoadingCats, setIsLoadingCats] = useState(false);
-  // const [totalCats, setTotalCats] = useState(0);
   const [loadMore, setLoadMore] = useState(true);
-  const [hasError, setHasError] = useState(false);
 
   //----------------
   // Handlers
@@ -32,9 +30,7 @@ const HomeScreen = () => {
     loadCats();
   };
 
-  const handleDetailsClick = (e, cat) => {
-    setBreedContext({ ...breedContext, cat: { ...cat } });
-    // console.log('breedContext', breedContext);
+  const handleViewDetailsClick = (e, cat) => {
     history.push(`/${cat.id}`);
   };
 
@@ -76,10 +72,6 @@ const HomeScreen = () => {
           prevCatCount === PAGE_LIMIT ||
           prevCatCount !== Object.keys(cats).length
       );
-
-      console.log('oldCount', prevCatCount);
-      console.log('current count', Object.keys(cats).length);
-      console.log('loadMOre', loadMore);
     } catch (err) {
       setHasError(true);
     }
@@ -114,6 +106,10 @@ const HomeScreen = () => {
     setLoadMore(true);
   };
 
+  const setHasError = (hasErr) => {
+    setBreedContext({ ...breedContext, hasError: hasErr });
+  };
+
   return (
     <Container className="my-4">
       <Row className="mb-3">
@@ -145,7 +141,7 @@ const HomeScreen = () => {
           </select>
         </Col>
       </Row>
-      {hasError && (
+      {breedContext.hasError && (
         <Row>
           <Col>
             <ErrorAlert onShowAlert={(show) => handleShowError(show)} />
@@ -172,7 +168,7 @@ const HomeScreen = () => {
                         block
                         size="lg"
                         value={cat}
-                        onClick={(e) => handleDetailsClick(e, cat)}
+                        onClick={(e) => handleViewDetailsClick(e, cat)}
                       >
                         View Details
                       </Button>

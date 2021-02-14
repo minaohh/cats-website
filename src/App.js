@@ -10,7 +10,7 @@ import CatDetails from './screens/CatDetailsScreen';
 function App() {
   const initialContextState = {
     breed: '',
-    cat: {},
+    hasError: false,
   };
   const [breedContext, setBreedContext] = useState(initialContextState);
 
